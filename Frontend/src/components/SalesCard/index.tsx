@@ -4,21 +4,24 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { BASE_URL } from '../../utils/request';
+import { sale } from '../../models/sale';
 
-function SalesCard() {  
+function SalesCard() {
 
 
     const min = new Date(new Date().setDate(new Date().getDate() - 365));
     const max = new Date()
 
-    useEffect(()=> {
-       axios.get("http://localhost:8080/sales")
-       .then(response =>{
-            console.log(response.data);
-       })
-    },[])
-    const [minDate,setMinDate] = useState(min);
-    const [maxDate,setMaxDate] = useState(max);
+    const [sales, setsales] = useState<sale[]>([]);
+    useEffect(() => {
+        axios.get(`${BASE_URL}/sales`)
+            .then(response => {
+                setsales(response.data.content);
+            })
+    }, [])
+    const [minDate, setMinDate] = useState(min);
+    const [maxDate, setMaxDate] = useState(max);
     return (
         <>
             <div className="dsmeta-card">
@@ -27,7 +30,7 @@ function SalesCard() {
                     <div className="dsmeta-form-control-container">
                         <DatePicker
                             selected={minDate}
-                            onChange={(date: Date) =>  setMinDate(date)}
+                            onChange={(date: Date) => setMinDate(date)}
                             className="dsmeta-form-control"
                             dateFormat="dd/MM/yyyy"
                         />
@@ -35,7 +38,7 @@ function SalesCard() {
                     <div className="dsmeta-form-control-container">
                         <DatePicker
                             selected={maxDate}
-                            onChange={(date: Date) => setMaxDate(date) }
+                            onChange={(date: Date) => setMaxDate(date)}
                             className="dsmeta-form-control"
                             dateFormat="dd/MM/yyyy"
                         />
@@ -56,48 +59,25 @@ function SalesCard() {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td className="show992">#341</td>
-                                <td className="show576">08/07/2022</td>
-                                <td>Anakim</td>
-                                <td className="show992">15</td>
-                                <td className="show992">11</td>
-                                <td>R$553.00</td>
-                                <td>
-                                    <div className="dsmeta-red-btn-container">
-                                        <NotificationButon />
-                                    </div>
+                            {sales.map(sale => {
+                                return (
+                                    <tr key= {sale.id}>
+                                        <td className="show992">{sale.id}</td>
+                                        <td className="show576">{new Date(sale.date).toLocaleDateString()}</td>
+                                        <td>{sale.sellerName}</td>
+                                        <td className="show992">{sale.visited}</td>
+                                        <td className="show992">{sale.deals}</td>
+                                        <td>R$ {sale.amount.toFixed(2)}</td>
+                                        <td>
+                                            <div className="dsmeta-red-btn-container">
+                                                <NotificationButon />
+                                            </div>
 
-                                </td>
-                            </tr>
-                            <tr>
-                                <td className="show992">#341</td>
-                                <td className="show576">08/07/2022</td>
-                                <td>Anakim</td>
-                                <td className="show992">15</td>
-                                <td className="show992">11</td>
-                                <td>R$553.00</td>
-                                <td>
-                                    <div className="dsmeta-red-btn-container">
-                                        <NotificationButon />
-                                    </div>
+                                        </td>
+                                    </tr>
+                                )
+                            })}
 
-                                </td>
-                            </tr>
-                            <tr>
-                                <td className="show992">#341</td>
-                                <td className="show576">08/07/2022</td>
-                                <td>Anakim</td>
-                                <td className="show992">15</td>
-                                <td className="show992">11</td>
-                                <td>R$553.00</td>
-                                <td>
-                                    <div className="dsmeta-red-btn-container">
-                                        <NotificationButon />
-                                    </div>
-
-                                </td>
-                            </tr>
                         </tbody>
                     </table>
                 </div>
